@@ -1,6 +1,6 @@
 require 'celluloid/io'
 
-class EchoServer
+class Server
   include Celluloid::IO
   include Celluloid::Logger
 
@@ -11,7 +11,7 @@ class EchoServer
   attr_reader :sockets
 
   def initialize(host, port)
-    info "*** Starting echo server on #{host}:#{port}"
+    info "Starting server on #{host}:#{port}"
 
     @sockets = []
 
@@ -37,11 +37,11 @@ class EchoServer
   def handle_connection(socket)
     sockets << socket
     _, port, host = socket.peeraddr
-    info "*** Received connection from #{host}:#{port}"
+    info "Received connection from #{host}:#{port}"
     name = "Anonymous"
     loop do
       msg = socket.readpartial(4096)
-      msg.gsub!("\n", "")
+      msg.strip!
       info msg
 
       if match = NAME_REGEX.match(msg)
@@ -50,19 +50,20 @@ class EchoServer
       end
 
       sockets.each do |socket|
-        if socket.closed?
-          sockets.delete(socket)
-          next
-        end
         socket.write "\033[00;34m#{name}\033[00m says: #{msg}\n"
       end
     end
   rescue EOFError
     info "*** #{host}:#{port} disconnected"
+    sockets.delete(socket)
     socket.close
   end
 end
 
-supervisor = EchoServer.supervise("127.0.0.1", 1234)
+class SupervisorGroup < Celluloid::SupervisionGroup
+  supervise Server, :as => :server, :args => ["127.0.0.1", 1234]
+end
+
+supervisor = SupervisorGroup.run
 trap("INT") { supervisor.terminate; exit }
 sleep
