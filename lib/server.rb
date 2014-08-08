@@ -36,23 +36,21 @@ class Server
     sockets << socket
     _, port, host = socket.peeraddr
     info "Received connection from #{host}:#{port}"
-    name = "Anonymous"
+
+    player = Player.new("Anonymous")
     loop do
       msg = socket.readpartial(4096)
       msg.strip!
-      info msg
 
       if match = NAME_REGEX.match(msg)
-        name = match["name"].strip
+        player.name = match["name"].strip
         next
       end
 
-      sockets.each do |socket|
-        socket.write "\033[00;34m#{name}\033[00m says: #{msg}\n"
-      end
+      player.say(msg)
     end
   rescue EOFError
-    info "*** #{host}:#{port} disconnected"
+    info "#{host}:#{port} disconnected"
     sockets.delete(socket)
     socket.close
   end
