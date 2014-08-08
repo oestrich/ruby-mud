@@ -1,5 +1,3 @@
-require 'celluloid/io'
-
 class Server
   include Celluloid::IO
   include Celluloid::Logger
@@ -59,11 +57,3 @@ class Server
     socket.close
   end
 end
-
-class SupervisorGroup < Celluloid::SupervisionGroup
-  supervise Server, :as => :server, :args => ["127.0.0.1", 1234]
-end
-
-supervisor = SupervisorGroup.run
-trap("INT") { supervisor.terminate; exit }
-sleep
