@@ -37,7 +37,7 @@ class Server
     _, port, host = socket.peeraddr
     info "Received connection from #{host}:#{port}"
 
-    player = Player.new("Anonymous")
+    player = Player.new(self, "Anonymous")
     loop do
       msg = socket.readpartial(4096)
       msg.strip!
@@ -53,5 +53,11 @@ class Server
     info "#{host}:#{port} disconnected"
     sockets.delete(socket)
     socket.close
+  end
+
+  def send_message(msg)
+    sockets.each do |socket|
+      socket.puts msg
+    end
   end
 end

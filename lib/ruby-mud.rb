@@ -1,6 +1,7 @@
 require 'celluloid/io'
 
 require 'player'
+require 'line'
+
 require 'server'
-require 'message_actor'
 require 'supervisor_group'

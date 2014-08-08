@@ -3,8 +3,6 @@
 boot = File.expand_path('../../config/boot.rb', __FILE__)
 load boot
 
-require 'ruby-mud'
-
 supervisor = SupervisorGroup.run
 trap("INT") { supervisor.terminate; exit }
 sleep

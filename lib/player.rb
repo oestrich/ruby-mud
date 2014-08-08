@@ -3,13 +3,17 @@ class Player
 
   attr_accessor :name
 
-  def initialize(name)
+  attr_reader :server
+  private :server
+
+  def initialize(server, name)
+    @server = server
     self.name = name
   end
 
   def say(msg)
-    message = "\033[00;34m#{name}\033[00m says: #{msg}\n"
+    message = Line.color(:blue, name).color(:white, " says: #{msg}").to_s
     info message.strip
-    Celluloid::Actor[:message_actor].async.send_message(message)
+    server.async.send_message(message)
   end
 end
