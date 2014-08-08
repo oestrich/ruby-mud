@@ -1,8 +1,21 @@
 class Line
   COLORS = {
-    :blue => "[34m",
-    :white => "[00m",
+    :black => "[30m",
     :red => "[31m",
+    :green => "[32m",
+    :yellow => "[33m",
+    :blue => "[34m",
+    :magenta => "[35m",
+    :cyan => "[36m",
+    :light_gray => "[37m",
+    :dark_gray => "[90m",
+    :light_red => "[91m",
+    :light_green => "[92m",
+    :light_yellow => "[93m",
+    :light_blue => "[94m",
+    :light_magenta => "[95m",
+    :light_cyan => "[96m",
+    :white => "[97m",
   }
 
   class << self
@@ -28,11 +41,20 @@ class Line
   end
 
   def color(color, message)
-    @message << "\033#{COLORS[color]}#{message}\033[00m"
+    if COLORS.keys.include?(color)
+      @message << "\033#{COLORS[color]}#{message}"
+    else
+      @message << "\033[0m#{message}"
+    end
+    self
+  end
+
+  def default(message)
+    @message << "\033[0m#{message}"
     self
   end
 
   def to_s
-    @message
+    "#{@message}\033[0m"
   end
 end
