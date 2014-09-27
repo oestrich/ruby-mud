@@ -2,8 +2,6 @@ class Server
   include Celluloid::IO
   include Celluloid::Logger
 
-  NAME_REGEX = /i am (?<name>.*)/i
-
   finalizer :finalize
 
   attr_reader :sockets
@@ -42,12 +40,7 @@ class Server
       msg = socket.readpartial(4096)
       msg.strip!
 
-      if match = NAME_REGEX.match(msg)
-        player.name = match["name"].strip
-        next
-      end
-
-      player.say(msg)
+      player.received_message(msg)
     end
   rescue EOFError
     info "#{host}:#{port} disconnected"

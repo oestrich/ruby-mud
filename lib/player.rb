@@ -1,6 +1,8 @@
 class Player
   include Celluloid::Logger
 
+  NAME_REGEX = /i am (?<name>.*)/i
+
   attr_accessor :name
 
   attr_reader :server
@@ -9,6 +11,15 @@ class Player
   def initialize(server, name)
     @server = server
     self.name = name
+  end
+
+  def received_message(message)
+    if match = NAME_REGEX.match(message)
+      self.name = match["name"].strip
+      return
+    end
+
+    say(message)
   end
 
   def say(msg)
